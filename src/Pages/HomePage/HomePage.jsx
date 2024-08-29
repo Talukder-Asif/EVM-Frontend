@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import Testimonial from "../../Component/Testimonial";
 import Logo from "/Logo-01.png";
 import BG from "/src/assets/BG.jpg";
@@ -23,9 +24,9 @@ const HomePage = () => {
               Join the voting platform that simplifies election management and
               ensures your vote counts in every election
             </p>
-            <button className="btn shadow border-[#2ec4b6] bg-[#2ec4b6] text-[#002a3f] hover:text-[#2ec4b6] hover:border-[#002a3f] hover:bg-[#002a3f] duration-500 m-2  hover:scale-110 text-sm hover:shadow-[#2ec4b6]">
+            <Link to={'/evm'}><button className="btn shadow border-[#2ec4b6] bg-[#2ec4b6] text-[#002a3f] hover:text-[#2ec4b6] hover:border-[#002a3f] hover:bg-[#002a3f] duration-500 m-2  hover:scale-110 text-sm hover:shadow-[#2ec4b6]">
               View Elections
-            </button>
+            </button></Link>
             <button className="btn shadow border-[#2ec4b6] bg-[#2ec4b6] text-[#002a3f] hover:text-[#2ec4b6] hover:border-[#002a3f] hover:bg-[#002a3f] duration-500 m-2  hover:scale-110 text-sm hover:shadow-[#2ec4b6]">
               Admin Login
             </button>
