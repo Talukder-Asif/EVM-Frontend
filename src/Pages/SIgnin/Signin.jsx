@@ -1,28 +1,113 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
+import { AuthContext } from "../../AuthProvider/AuthProvider";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
+import Swal from "sweetalert2";
 
 const Signin = () => {
   const [signUp, setSignUp] = useState(false);
-  const handleSignin = (e) =>{
+  const [passwordError, setPasswordError] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const { googleSignin, signupEmailPassword, signinEmailPassword, updateUser } = useContext(AuthContext);
+  const navigate = useNavigate();
+
+
+  // Signin Method
+  const handleSignin = (e) => {
     e.preventDefault();
-    const from = e.target;
-    const email = from.email.value;
-    const password = from.password.value;
-    console.log(email, password)
-  }
+    const form = e.target;
+    const email = form.email.value;
+    const password = form.password.value;
+    console.log(email, password);
+    signinEmailPassword(email, password)
+    .then((userCredential) => {
+      // Signed in 
+      const user = userCredential.user;
+      console.log(user)
+      Swal.fire({
+        position: "center",
+        icon: "success",
+        title: "Sign in successfully",
+        showConfirmButton: false,
+        timer: 1500
+      });
+      navigate('/')
+    })
+    .catch((error) => {
+      const errorMessage = error.message;
+      console.log(errorMessage)
+    });
+  };
 
 
-const handleSignup = (e) =>{
+  // Signup Method
+  const handleSignup = (e) => {
     e.preventDefault();
-    const from = e.target;
-    const name = from.name.value;
-    const email = from.email.value;
-    const batch = from.batch.value;
-    const studentID = from.studentID.value;
-    const password = from.password.value;
+    const form = e.target;
+    const name = form.name.value;
+    const email = form.email.value;
+    const batch = form.batch.value;
+    const studentID = form.studentID.value;
+    const password = form.password.value;
+    const image = "https://avatars.githubusercontent.com/u/139608907?v=4"
 
-    console.log(name, email, password, batch, studentID)
-  
-}
+    if (password.length < 6) {
+      setPasswordError("Password must be at least 6 characters long");
+      return;
+    } else {
+      setPasswordError("");
+    }
+
+    console.log(name, email, password, batch, studentID);
+    signupEmailPassword(email, password)
+      .then((userCredential) => {
+        // Signed up
+        updateUser(name, image)
+
+        const user = userCredential.user;
+        console.log(user);
+        form.reset();
+        setPasswordError("");
+        Swal.fire({
+          position: "center",
+          icon: "success",
+          title: "Sign Up successfully",
+          showConfirmButton: false,
+          timer: 1500
+        });
+        navigate('/')
+        
+        // ...
+      })
+      .catch((error) => {
+        const errorMessage = error.message;
+        console.log(errorMessage);
+        // ..
+      });
+  };
+
+  // Signin with google
+  const handleGoogle = () => {
+    googleSignin()
+      .then((res) => {
+        console.log(res?.user);
+        Swal.fire({
+          position: "center",
+          icon: "success",
+          title: "Sign in successfully",
+          showConfirmButton: false,
+          timer: 1500
+        });
+        navigate('/')
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
 
   return (
     <div className="max-w-screen-xl m-auto min-h-[80vh]">
@@ -40,7 +125,8 @@ const handleSignup = (e) =>{
 
         <div className="w-full flex-col items-center overflow-hidden p-4 sm:p-8">
           {/* sign up form  */}
-          <form onSubmit={handleSignup}
+          <form
+            onSubmit={handleSignup}
             className={`${
               signUp ? "h-full duration-300" : "invisible h-0 opacity-0"
             } space-y-3 sm:space-y-5`}
@@ -81,23 +167,46 @@ const handleSignup = (e) =>{
                 className="file-input file-input-bordered w-full block rounded-md border outline-none dark:border-[#002a3f] focus:ring-1 ring-[#002a3f]"
               />
 
-              <input
-                type="password"
-                name="password"
-                placeholder="Password"
-                className="block w-full rounded-md border p-2.5 outline-none dark:border-[#002a3f] focus:ring-1 ring-[#002a3f]"
-                required
-              />
+              <div className="relative block w-full">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  name="password"
+                  placeholder="Password"
+                  className="block w-full rounded-md border p-2.5 outline-none dark:border-[#002a3f] focus:ring-1 ring-[#002a3f]"
+                  required
+                  onChange={(e) =>
+                    setPasswordError(
+                      e.target.value.length < 6
+                        ? "Password must be at least 6 characters long"
+                        : ""
+                    )
+                  }
+                />
+                <div
+                  onClick={togglePasswordVisibility}
+                  className="absolute inset-y-0 right-3 flex items-center cursor-pointer"
+                >
+                  {showPassword ? (
+                    <FaEyeSlash className="text-[#002a3f]" />
+                  ) : (
+                    <FaEye className="text-[#002a3f]" />
+                  )}
+                </div>
+              </div>
+              {passwordError && (
+                <p className="text-red-500 text-sm">{passwordError}</p>
+              )}
             </div>
+
             {/* button type will be submit for handling form submission*/}
-            
             <div className="text-center">
-            <button
-              type="submit"
-              className="btn shadow w-full md:w-1/2 border-[#002a3f] bg-[#002a3f] text-white hover:text-[#002a3f] hover:border-[#2ec4b6] hover:bg-[#2ec4b6] duration-500 m-2  hover:scale-110 hover:shadow-[#2ec4b6] uppercase text-base font-normal"
-            >
-              Submit
-            </button>
+              <button
+                type="submit"
+                className="btn shadow w-full md:w-1/2 border-[#002a3f] bg-[#002a3f] text-white hover:text-[#002a3f] hover:border-[#2ec4b6] hover:bg-[#2ec4b6] duration-500 m-2  hover:scale-110 hover:shadow-[#2ec4b6] uppercase text-base font-normal"
+                disabled={passwordError !== ""}
+              >
+                Submit
+              </button>
             </div>
             <p className="text-center">
               Already have an account?{" "}
@@ -112,38 +221,50 @@ const handleSignup = (e) =>{
           </form>
 
           {/* signin form */}
-          <form onSubmit={handleSignin}
+          <form
+            onSubmit={handleSignin}
             className={`${
               signUp ? "h-0 opacity-0" : "h-full duration-300"
             } space-y-3 sm:space-y-5`}
           >
             <h1 className="mb-3 uppercase sm:mb-5 sm:text-2xl">Sign In</h1>
             <div className="grid md:grid-cols-2 gap-5">
-            <input
-              type="email"
-              placeholder="Email"
-              name="email"
-              className="block w-full rounded-md border p-2.5 outline-none dark:border-[#002a3f] focus:ring-1 ring-[#002a3f]"
-              required
-            />
-            <input
-              type="password"
-              placeholder="Password"
-              name="password"
-              className="block w-full rounded-md border p-2.5 outline-none dark:border-[#002a3f] focus:ring-1 ring-[#002a3f]"
-              required
-            />
+              <input
+                type="email"
+                placeholder="Email"
+                name="email"
+                className="block w-full rounded-md border p-2.5 outline-none dark:border-[#002a3f] focus:ring-1 ring-[#002a3f]"
+                required
+              />
+              <div className="relative block w-full">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Password"
+                  name="password"
+                  className="block w-full rounded-md border p-2.5 outline-none dark:border-[#002a3f] focus:ring-1 ring-[#002a3f]"
+                  required
+                />
+                <div
+                  onClick={togglePasswordVisibility}
+                  className="absolute inset-y-0 right-3 flex items-center cursor-pointer"
+                >
+                  {showPassword ? (
+                    <FaEyeSlash className="text-[#002a3f]" />
+                  ) : (
+                    <FaEye className="text-[#002a3f]" />
+                  )}
+                </div>
+              </div>
             </div>
-            
-            
+
             {/* button type will be submit for handling form submission*/}
             <div className="text-center">
-            <button
-              type="submit"
-              className="btn shadow w-full md:w-1/2 border-[#002a3f] bg-[#002a3f] text-white hover:text-[#002a3f] hover:border-[#2ec4b6] hover:bg-[#2ec4b6] duration-500 m-2  hover:scale-110 hover:shadow-[#2ec4b6] uppercase text-base font-normal"
-            >
-              Submit
-            </button>
+              <button
+                type="submit"
+                className="btn shadow w-full md:w-1/2 border-[#002a3f] bg-[#002a3f] text-white hover:text-[#002a3f] hover:border-[#2ec4b6] hover:bg-[#2ec4b6] duration-500 m-2  hover:scale-110 hover:shadow-[#2ec4b6] uppercase text-base font-normal"
+              >
+                Submit
+              </button>
             </div>
             <p className="text-center">
               Don&apos;t have an account?{" "}
@@ -159,7 +280,10 @@ const handleSignup = (e) =>{
 
           <div className="mt-3 space-y-3 sm:space-y-5">
             <hr className="border-[#002a3f]" />
-            <button className="mx-auto mb-4 mt-8 block rounded-md border px-5 py-2 shadow-lg duration-200 hover:bg-zinc-400/10 dark:border-[#002a3f] dark:hover:bg-[#002a3f] dark:hover:text-white">
+            <button
+              onClick={handleGoogle}
+              className="mx-auto mb-4 mt-8 block rounded-md border px-5 py-2 shadow-lg duration-200 hover:bg-zinc-400/10 dark:border-[#002a3f] dark:hover:bg-[#002a3f] dark:hover:text-white"
+            >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 32 32"
@@ -177,3 +301,4 @@ const handleSignup = (e) =>{
 };
 
 export default Signin;
+
