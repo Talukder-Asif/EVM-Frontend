@@ -3,6 +3,11 @@ import { AuthContext } from "../../AuthProvider/AuthProvider";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
+import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
+import { storage } from "../../Config/firebase.config";
+import { v4 } from "uuid";
+import imageCompression from 'browser-image-compression';
+
 
 const Signin = () => {
   const [signUp, setSignUp] = useState(false);
@@ -10,6 +15,7 @@ const Signin = () => {
   const [showPassword, setShowPassword] = useState(false);
   const { googleSignin, signupEmailPassword, signinEmailPassword, updateUser } = useContext(AuthContext);
   const navigate = useNavigate();
+  const [imageUpload, setImageUpload]= useState(null);
 
 
   // Signin Method
@@ -41,7 +47,7 @@ const Signin = () => {
 
 
   // Signup Method
-  const handleSignup = (e) => {
+  const handleSignup = async (e) => {
     e.preventDefault();
     const form = e.target;
     const name = form.name.value;
@@ -49,41 +55,64 @@ const Signin = () => {
     const batch = form.batch.value;
     const studentID = form.studentID.value;
     const password = form.password.value;
-    const image = "https://avatars.githubusercontent.com/u/139608907?v=4"
-
+  
     if (password.length < 6) {
       setPasswordError("Password must be at least 6 characters long");
       return;
     } else {
       setPasswordError("");
     }
-
-    console.log(name, email, password, batch, studentID);
-    signupEmailPassword(email, password)
-      .then((userCredential) => {
-        // Signed up
-        updateUser(name, image)
-
-        const user = userCredential.user;
-        console.log(user);
-        form.reset();
-        setPasswordError("");
-        Swal.fire({
-          position: "center",
-          icon: "success",
-          title: "Sign Up successfully",
-          showConfirmButton: false,
-          timer: 1500
-        });
-        navigate('/')
-        
-        // ...
-      })
-      .catch((error) => {
-        const errorMessage = error.message;
-        console.log(errorMessage);
-        // ..
+  
+    // Check if an image has been uploaded
+    if (!imageUpload) {
+      return Swal.fire({
+        title: "Please upload your profile picture",
+        showConfirmButton: false,
+        timer: 1500
       });
+    }
+  
+    try {
+      // Compress the image before uploading
+      const compressedImage = await imageCompression(imageUpload, {
+        maxSizeMB: 0.3,
+        maxWidthOrHeight: 500,
+        useWebWorker: true,
+      });
+  
+      // Upload the compressed image
+      const imageRef = ref(storage, `users/${compressedImage.name + v4()}`);
+      const snapshot = await uploadBytes(imageRef, compressedImage);
+  
+      // Get the download URL
+      const imageURL = await getDownloadURL(snapshot.ref);
+  
+      console.log(name, email, password, batch, studentID);
+      const userCredential = await signupEmailPassword(email, password);
+      // Update user profile
+      updateUser(name, imageURL);
+  
+      const user = userCredential.user;
+      console.log(user);
+      form.reset();
+      setPasswordError("");
+      Swal.fire({
+        position: "center",
+        icon: "success",
+        title: "Sign Up successfully",
+        showConfirmButton: false,
+        timer: 1500
+      });
+      navigate('/');
+  
+    } catch (error) {
+      console.error('Error during signup:', error.message);
+      Swal.fire({
+        title: 'Error during signup',
+        text: error.message,
+        icon: 'error',
+      });
+    }
   };
 
   // Signin with google
@@ -163,7 +192,7 @@ const Signin = () => {
               />
               <input
                 type="file"
-                placeholder="Student ID"
+                onChange={(e)=> setImageUpload(e.target.files[0])}
                 className="file-input file-input-bordered w-full block rounded-md border outline-none dark:border-[#002a3f] focus:ring-1 ring-[#002a3f]"
               />
 
