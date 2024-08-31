@@ -1,11 +1,10 @@
-import { NavLink } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 import Logo from "/src/assets/Logo-01.png";
 import { useContext } from "react";
 import { AuthContext } from "../AuthProvider/AuthProvider";
 import Swal from "sweetalert2";
 const NavBar = () => {
   const { signout, User } = useContext(AuthContext);
-  console.log(User);
   const handleSignOut = () => {
     Swal.fire({
       title: "Are you sure?",
@@ -191,10 +190,12 @@ const NavBar = () => {
               className="btn btn-ghost btn-circle avatar"
             >
               <div className="w-10 rounded-full">
+              <Link to={"/dashboard"}>
                 <img
                   alt={User?.displayName}
                   src={User?.photoURL}
                 />
+              </Link>
               </div>
             </div>: null
         }
