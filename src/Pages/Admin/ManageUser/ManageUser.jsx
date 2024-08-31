@@ -11,7 +11,11 @@ const ManageUser = () => {
       name: user?.name,
       email: user?.email,
       role: newRole,
-      photo: user?.photo,
+      photoURL: user?.photoURL,
+      batch : user?.batch,
+      studentID: user?.studentID,
+      accountType: user?.accountType,
+      department: user?.department
     };
     axios
       .put(`http://localhost:5000/user/${user?.email}`, updateData)
@@ -100,7 +104,7 @@ const ManageUser = () => {
               <label>#</label>
             </th>
             <th>Name</th>
-            <th>Email</th>
+            <th>Department</th>
             <th>Role</th>
             <th></th>
           </tr>
@@ -122,11 +126,14 @@ const ManageUser = () => {
                     </div>
                   </div>
                   <div>
-                    <div className="font-bold">{userData?.name}</div>
+                    <p className="font-bold">{userData?.name} <br />
+                    </p>
+                    <span className="text-sm">{userData?.email}</span>
+
                   </div>
                 </div>
               </td>
-              <td>{userData?.email}</td>
+              <td>{userData?.department? userData?.department : "Not Defined" }</td>
               <td>{userData?.role}</td>
               <th>
                 {user?.role === "Admin" && userData?.role !== "SuperAdmin" ? (
