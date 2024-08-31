@@ -2,20 +2,21 @@ import axios from "axios";
 import Swal from "sweetalert2";
 import useAllUsers from "../../../Hooks/useAllUsers";
 import useUserDetails from "../../../Hooks/useUserDetails";
+import { Link } from "react-router-dom";
 
 const ManageUser = () => {
   const [Users, isUsersLoading, refetch] = useAllUsers();
-  const [user] = useUserDetails()
+  const [user] = useUserDetails();
   const handleRoleUpdate = (newRole, user) => {
     const updateData = {
       name: user?.name,
       email: user?.email,
       role: newRole,
       photoURL: user?.photoURL,
-      batch : user?.batch,
+      batch: user?.batch,
       studentID: user?.studentID,
       accountType: user?.accountType,
-      department: user?.department
+      department: user?.department,
     };
     axios
       .put(`http://localhost:5000/user/${user?.email}`, updateData)
@@ -113,27 +114,33 @@ const ManageUser = () => {
           {Users?.map((userData, i) => (
             <tr
               key={i}
-              className={user?.email === userData?.email ? "bg-orange-300" : null}
+              className={
+                user?.email === userData?.email ? "bg-orange-300" : null
+              }
             >
               <th>
                 <label>{i + 1}</label>
               </th>
               <td>
-                <div className="flex items-center gap-3">
-                  <div className="avatar">
-                    <div className="mask mask-squircle w-12 h-12">
-                      <img src={userData?.photoURL} alt="userData Avatar" />
+                <Link to={`/dashboard/users/${userData?.email}`}>
+                  <div className="flex items-center gap-3">
+                    <div className="avatar">
+                      <div className="mask mask-squircle w-12 h-12">
+                        <img src={userData?.photoURL} alt="userData Avatar" />
+                      </div>
+                    </div>
+                    <div>
+                      <p className="font-bold">
+                        {userData?.name} <br />
+                      </p>
+                      <span className="text-sm">{userData?.email}</span>
                     </div>
                   </div>
-                  <div>
-                    <p className="font-bold">{userData?.name} <br />
-                    </p>
-                    <span className="text-sm">{userData?.email}</span>
-
-                  </div>
-                </div>
+                </Link>
               </td>
-              <td>{userData?.department? userData?.department : "Not Defined" }</td>
+              <td>
+                {userData?.department ? userData?.department : "Not Defined"}
+              </td>
               <td>{userData?.role}</td>
               <th>
                 {user?.role === "Admin" && userData?.role !== "SuperAdmin" ? (
@@ -158,7 +165,11 @@ const ManageUser = () => {
                     className="select select-bordered w-full max-w-xs"
                   >
                     <option disabled>Update Role</option>
-                    <option className={userData?.role === "userData" ? "hidden" : null}>
+                    <option
+                      className={
+                        userData?.role === "userData" ? "hidden" : null
+                      }
+                    >
                       userData
                     </option>
                     <option
@@ -172,7 +183,9 @@ const ManageUser = () => {
                       Employ
                     </option>
                     <option
-                      className={userData?.role === "Moderator" ? "hidden" : null}
+                      className={
+                        userData?.role === "Moderator" ? "hidden" : null
+                      }
                     >
                       Moderator
                     </option>
