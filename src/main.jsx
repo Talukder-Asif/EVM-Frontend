@@ -12,6 +12,7 @@ import Profile from "./Pages/User/Profile";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import ManageUser from "./Pages/Admin/ManageUser/ManageUser";
 import ManageSingleUser from "./Pages/Admin/ManageSingleUser/ManageSingleUser";
+import AddElections from "./Pages/Admin/AddElection/AddElections";
 
 const router = createBrowserRouter([
   {
@@ -43,6 +44,10 @@ const router = createBrowserRouter([
           },{
             path: "/dashboard/users/:email",
             element: <ManageSingleUser></ManageSingleUser>
+          }
+          ,{
+            path: "/dashboard/addelections",
+            element: <AddElections></AddElections>
           }
         ],
       },
