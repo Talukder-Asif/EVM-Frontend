@@ -167,27 +167,20 @@ const ManageUser = () => {
                     <option disabled>Update Role</option>
                     <option
                       className={
-                        userData?.role === "userData" ? "hidden" : null
+                        userData?.role === "User" ? "hidden" : null
                       }
                     >
-                      userData
+                      User
                     </option>
                     <option
-                      className={userData?.role === "Client" ? "hidden" : null}
+                      className={userData?.role === "EVM" ? "hidden" : null}
                     >
-                      Client
+                      EVM
                     </option>
                     <option
-                      className={userData?.role === "Employ" ? "hidden" : null}
+                      className={userData?.role === "Live Result" ? "hidden" : null}
                     >
-                      Employ
-                    </option>
-                    <option
-                      className={
-                        userData?.role === "Moderator" ? "hidden" : null
-                      }
-                    >
-                      Moderator
+                      Live Result
                     </option>
                     <option
                       className={userData?.role === "Admin" ? "hidden" : null}
