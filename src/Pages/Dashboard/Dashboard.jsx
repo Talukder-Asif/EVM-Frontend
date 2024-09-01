@@ -1,4 +1,4 @@
-import { FaUserAlt } from "react-icons/fa";
+import { FaUserAlt, FaVoteYea } from "react-icons/fa";
 import {NavLink, Outlet } from "react-router-dom";
 
 const Dashboard = () => {
@@ -26,8 +26,8 @@ const Dashboard = () => {
                 `flex items-center py-3 px-6 text-sm font-medium uppercase tracking-widest duration-300 border-2 group border-[#002a3f] ${isActive ? '!bg-[#002a3f] !text-white hover:!bg-[#2ec4b6] hover:!text-[#002a3f] hover:!border-[#2ec4b6]' : 'hover:bg-[#002a3f] hover:text-white hover:border-[#2ec4b6]'}`
             }
         >
-            <FaUserAlt className="text-[#2ec4b6] text-xl group-hover:text-white" />
-            <span className="ms-3">Add Elections</span>
+            <FaVoteYea className="text-[#2ec4b6] text-xl group-hover:text-white" />
+            <span className="ms-3">Create Elections</span>
         </NavLink>
     </li>
 </ul>
