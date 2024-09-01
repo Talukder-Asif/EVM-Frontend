@@ -27,6 +27,7 @@ const axiosPublic = useAxios()
       details: form.details.value,
       candidate: [{}],
       voter: [{}],
+      status: "Upcoming"
     };
     console.log(formData);
 

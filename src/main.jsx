@@ -13,6 +13,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import ManageUser from "./Pages/Admin/ManageUser/ManageUser";
 import ManageSingleUser from "./Pages/Admin/ManageSingleUser/ManageSingleUser";
 import AddElections from "./Pages/Admin/AddElection/AddElections";
+import AllElections from "./Pages/Admin/AllElections/AllElections";
 
 const router = createBrowserRouter([
   {
@@ -48,6 +49,10 @@ const router = createBrowserRouter([
           ,{
             path: "/dashboard/addelections",
             element: <AddElections></AddElections>
+          }
+          ,{
+            path: "/dashboard/allelections",
+            element: <AllElections></AllElections>
           }
         ],
       },
