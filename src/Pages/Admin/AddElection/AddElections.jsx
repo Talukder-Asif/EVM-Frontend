@@ -1,12 +1,16 @@
 import { useState } from "react";
 import useAxios from "../../../Hooks/useAxios";
 import Swal from "sweetalert2";
+import imageCompression from 'browser-image-compression';
+import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
+import { storage } from "../../../Config/firebase.config";
+import { v4 } from "uuid";
 
 const departments = ["CSE", "EEE", "English", "Pharmacy", "BBA", "MIS", "LAW"];
 
 const AddElections = () => {
   const [selectedDepartments, setSelectedDepartments] = useState([]);
-const axiosPublic = useAxios()
+  const axiosPublic = useAxios();
   const toggleDepartmentSelection = (department) => {
     if (selectedDepartments.includes(department)) {
       setSelectedDepartments(
@@ -17,8 +21,34 @@ const axiosPublic = useAxios()
     }
   };
 
-  const handleSubmit = (e) => {
+  const [imageUpload, setImage] = useState(null);
+
+  const handleSubmit = async(e) => {
     e.preventDefault();
+
+    if (!imageUpload) {
+      return Swal.fire({
+        title: "Please upload a picture",
+        showConfirmButton: false,
+        timer: 1500
+      });
+    }
+
+    try {
+      // Compress the image before uploading
+      const compressedImage = await imageCompression(imageUpload, {
+        maxSizeMB: 0.3,
+        maxWidthOrHeight: 500,
+        useWebWorker: true,
+      });
+  
+      // Upload the compressed image
+      const imageRef = ref(storage, `users/${compressedImage.name + v4()}`);
+      const snapshot = await uploadBytes(imageRef, compressedImage);
+  
+      // Get the download URL
+      const imageURL = await getDownloadURL(snapshot.ref);
+      
     const form = e.target;
     const formData = {
       electionName: form.electionName.value,
@@ -27,26 +57,39 @@ const axiosPublic = useAxios()
       details: form.details.value,
       candidate: [{}],
       voter: [{}],
-      status: "Upcoming"
+      status: "Upcoming",
+      imageURL,
     };
     console.log(formData);
 
     // Add your API call here
-    axiosPublic.post('/election', formData)
-    .then(res =>{
-        console.log(res.data)
-        if(res.data.acknowledged){
-            setSelectedDepartments([])
-            form.reset();
-            Swal.fire({
-              position: "center",
-              icon: "success",
-              title: "Election created successfully!",
-              showConfirmButton: false,
-              timer: 1500,
-            });
-        }
-    })
+    axiosPublic.post("/election", formData).then((res) => {
+      console.log(res.data);
+      if (res.data.acknowledged) {
+        setSelectedDepartments([]);
+        form.reset();
+        Swal.fire({
+          position: "center",
+          icon: "success",
+          title: "Election created successfully!",
+          showConfirmButton: false,
+          timer: 1500,
+        });
+      }
+    });
+  
+
+
+  
+    } catch (error) {
+      console.error('Error during signup:', error.message);
+      Swal.fire({
+        title: 'Error during signup',
+        text: error.message,
+        icon: 'error',
+      });
+    }
+
   };
   return (
     <div className=" mx-auto mt-10 bg-white p-6 rounded-lg">
@@ -96,6 +139,14 @@ const axiosPublic = useAxios()
             ))}
           </div>
         </div>
+        <label className="form-control w-full">
+            <span className="label-text font-semibold">Add an Image</span>
+          <input
+          onChange={(e)=> setImage(e.target.files[0])}
+            type="file"
+            className="file-input mt-1 file-input-[#002a3f] border border-[#002a3f] w-full"
+          />
+        </label>
 
         {/* Details */}
         <textarea
