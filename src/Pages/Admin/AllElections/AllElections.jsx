@@ -30,6 +30,30 @@ const AllElections = () => {
     });
   };
 
+  const handleUpdate = (election,e) => {
+    const updateData = {
+        electionName: election.electionName,
+        date: election.date,
+        departments: election.departments,
+        details: election.details,
+        candidate: election.candidate,
+        voter: election.voter,
+        status: e,
+        imageURL: election.imageURL,
+      };
+      axiosPublic.put(`/element/${election._id}`, updateData)
+      .then(res => {
+        if(res.data.modifiedCount > 0){
+            Swal.fire({
+                title: "Updated!",
+                text: `${election.electionName}'s status Updated`,
+                icon: "success",
+              });
+              refetch();
+        };
+      })
+  };
+
   if (isElectionLoading) return <div>Loading...</div>;
   return (
     <div>
@@ -69,22 +93,49 @@ const AllElections = () => {
                 </td>
                 <td>{election?.departments.map((d) => `${d} `)}</td>
 
+                <td>
+                  <select
+                    className="select border-[#002a3f]"
+                    defaultValue={election?.status}
+                    name="status"
+                    onChange={(e) => {
+                      Swal.fire({
+                        title: "Are you sure?",
+                        text: `Do you want to Update status`,
+                        icon: "warning",
+                        showCancelButton: true,
+                        confirmButtonColor: "#3085d6",
+                        cancelButtonColor: "#d33",
+                        confirmButtonText: "Yes, update it!",
+                      }).then((result) => {
+                        if (result.isConfirmed) {
+                            handleUpdate(election,e.target.value);
+                        }
+                      });
+                    }}
+                  >
+                    <option
+                      className={
+                        election?.status === "Ongoing" ? "hidden" : null
+                      }
+                    >
+                      Ongoing
+                    </option>
+                    <option
+                      className={election?.status === "END" ? "hidden" : null}
+                    >
+                      END
+                    </option>
+                    <option
+                      className={
+                        election?.status === "Upcoming" ? "hidden" : null
+                      }
+                    >
+                      Upcoming
+                    </option>
+                  </select>
+                </td>
 
-
-
-
-                <td>{election?.status}</td>
-
-
-
-
-
-
-
-
-
-
-                
                 <td>
                   <button
                     onClick={() => handleDelete(election._id)}
