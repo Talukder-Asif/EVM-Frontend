@@ -64,7 +64,6 @@ const AddElections = () => {
 
     // Add your API call here
     axiosPublic.post("/election", formData).then((res) => {
-      console.log(res.data);
       if (res.data.acknowledged) {
         setSelectedDepartments([]);
         form.reset();
