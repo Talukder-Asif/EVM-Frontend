@@ -1,9 +1,13 @@
 import { useState } from "react";
 import useAxios from "../../../Hooks/useAxios";
 import Swal from "sweetalert2";
+import useDepartment from "../../../Hooks/useDepartment";
+import { MdDeleteOutline, MdOutlineSettings } from "react-icons/md";
 
 const Department = () => {
   const [openModal, setOpenModal] = useState(false);
+  const [Department, isDepartmentLoading] = useDepartment();
+  console.log(Department)
   const axiosPublic = useAxios();
   const handleDepartment = (e) => {
     e.preventDefault();
@@ -28,6 +32,10 @@ const Department = () => {
     });
   };
 
+  if(isDepartmentLoading){
+    return <div>Loading...</div>
+  }
+
   return (
     <div>
       <div className="overflow-x-auto">
@@ -36,33 +44,29 @@ const Department = () => {
           <thead>
             <tr>
               <th></th>
-              <th>Name</th>
-              <th>Job</th>
-              <th>Favorite Color</th>
+              <th>Department</th>
+              <th>Program</th>
+              <th className="text-center">Batch</th>
+              <th className="text-center">Button</th>
             </tr>
           </thead>
-          <tbody>
-            {/* row 2 */}
-            <tr className="hover">
-              <th>2</th>
-              <td>Hart Hagerty</td>
-              <td>Desktop Support Technician</td>
-              <td>Purple</td>
-            </tr>
-            {/* row 2 */}
-            <tr className="hover">
-              <th>2</th>
-              <td>Hart Hagerty</td>
-              <td>Desktop Support Technician</td>
-              <td>Purple</td>
-            </tr>
-            {/* row 2 */}
-            <tr className="hover">
-              <th>2</th>
-              <td>Hart Hagerty</td>
-              <td>Desktop Support Technician</td>
-              <td>Purple</td>
-            </tr>
+          <tbody>            
+            
+          {
+  Department?.map((e, index) => (
+    <tr className="hover" key={index}>
+      <th>{index + 1}</th>
+      <td>{e?.department}</td>
+      <td>{e?.program}</td>
+      <td className="text-center">{e?.batch.map(e=> `${e} `)}</td>
+      <td className="text-center">
+      <button className="text-white mx-1 bg-[#002a3f] w-auto py-1 px-4 text-2xl rounded hover:bg-[#2ec4b6] hover:text-[#002a3f] duration-300"><MdOutlineSettings /></button>
+
+      <button className="text-white mx-1 bg-red-600 w-auto py-1 px-4 text-2xl rounded hover:bg-red-700 duration-300"><MdDeleteOutline /></button>
+      </td>
+    </tr>
+  ))
+}
           </tbody>
         </table>
 
