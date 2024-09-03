@@ -43,20 +43,32 @@ const Department = () => {
       program: form.program.value,
       batch: form.batch.value.split(",").map(item => item.trim())    };
     console.log(formData);
-    axiosPublic.post("/department", formData).then((res) => {
-      if (res.data.acknowledged) {
-        refetch();
-        setOpenModal(false);
-        form.reset();
-        Swal.fire({
-          position: "center",
-          icon: "success",
-          title: "Election created successfully!",
-          showConfirmButton: false,
-          timer: 1500,
-        });
-      }
-    });
+    axiosPublic.post("/department", formData)
+  .then((res) => {
+    if (res.data.acknowledged) {
+      refetch();
+      setOpenModal(false);
+      form.reset();
+      Swal.fire({
+        position: "center",
+        icon: "success",
+        title: "Department created successfully!",
+        showConfirmButton: false,
+        timer: 1500,
+      });
+    }
+  })
+  .catch((error) => {
+    if (error.response && error.response.status === 409) {
+      Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: `${form?.department?.value} Department already exists!`,
+      });
+    } else {
+      console.error(error);
+    }
+  });
   };
 
   if(isDepartmentLoading){
