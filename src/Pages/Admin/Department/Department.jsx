@@ -6,9 +6,35 @@ import { MdDeleteOutline, MdOutlineSettings } from "react-icons/md";
 
 const Department = () => {
   const [openModal, setOpenModal] = useState(false);
-  const [Department, isDepartmentLoading] = useDepartment();
-  console.log(Department)
+  const [Department, isDepartmentLoading, refetch] = useDepartment();
   const axiosPublic = useAxios();
+
+  const handleDelete = (e) =>{
+    Swal.fire({
+      title: "Are you sure?",
+      text: `Do you want to delete ${e?.department}?`,
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#eb0029",
+      cancelButtonColor: "#28b392",
+      confirmButtonText: "Yes",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        axiosPublic.delete(`/department/${e?._id}`).then((res) => {
+          if (res.data.deletedCount > 0) {
+            refetch();
+            Swal.fire({
+              icon: "success",
+              title: `${e?.department} has been deleted from the database`,
+              showConfirmButton: false,
+              timer: 1500,
+            });
+          }
+        });
+      }
+    });
+  }
+
   const handleDepartment = (e) => {
     e.preventDefault();
     const form = e.target;
@@ -19,6 +45,7 @@ const Department = () => {
     console.log(formData);
     axiosPublic.post("/department", formData).then((res) => {
       if (res.data.acknowledged) {
+        refetch();
         setOpenModal(false);
         form.reset();
         Swal.fire({
@@ -62,7 +89,7 @@ const Department = () => {
       <td className="text-center">
       <button className="text-white mx-1 bg-[#002a3f] w-auto py-1 px-4 text-2xl rounded hover:bg-[#2ec4b6] hover:text-[#002a3f] duration-300"><MdOutlineSettings /></button>
 
-      <button className="text-white mx-1 bg-red-600 w-auto py-1 px-4 text-2xl rounded hover:bg-red-700 duration-300"><MdDeleteOutline /></button>
+      <button onClick={()=>handleDelete(e)} className="text-white mx-1 bg-red-600 w-auto py-1 px-4 text-2xl rounded hover:bg-red-700 duration-300"><MdDeleteOutline /></button>
       </td>
     </tr>
   ))
