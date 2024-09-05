@@ -15,6 +15,7 @@ import ManageSingleUser from "./Pages/Admin/ManageSingleUser/ManageSingleUser";
 import AddElections from "./Pages/Admin/AddElection/AddElections";
 import AllElections from "./Pages/Admin/AllElections/AllElections";
 import Department from "./Pages/Admin/Department/Department";
+import Voters from "./Pages/Admin/ManageVoters/Voters";
 
 const router = createBrowserRouter([
   {
@@ -58,6 +59,10 @@ const router = createBrowserRouter([
           ,{
             path: "/dashboard/department",
             element: <Department></Department>
+          }
+          ,{
+            path: "/dashboard/voters",
+            element: <Voters></Voters>
           }
         ],
       },
