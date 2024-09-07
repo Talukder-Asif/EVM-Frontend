@@ -6,6 +6,7 @@ const Voters = () => {
   const [Department, isDepartmentLoading, refetch] = useDepartment();
   const [openModal, setOpenModal] = useState(false);
   const [accountType, setAccountType] = useState("Student");
+  const [department, setDepartment] = useState(null)
   const [imageUpload ,setImageUpload] = useState(null);
   const handleAddVoter = (e) =>{
     e.preventDefault();
@@ -13,10 +14,8 @@ const Voters = () => {
   }
 
 
-
-
   return (
-    <div>
+    <div >
       <div className="flex justify-between items-center flex-wrap my-5">
         <div>
           <h3 className="text-2xl font-semibold">List Of voters</h3>
@@ -62,13 +61,7 @@ const Voters = () => {
               className="block w-full rounded-md border p-2.5 outline-none dark:border-[#002a3f] focus:ring-1 ring-[#002a3f]"
               required
             />
-            <input
-              type="email"
-              name="email"
-              placeholder="Email"
-              className="block w-full rounded-md border p-2.5 outline-none dark:border-[#002a3f] focus:ring-1 ring-[#002a3f]"
-              required
-            />
+
 
             {/* Type of Account */}
             <select
@@ -86,30 +79,38 @@ const Voters = () => {
               name="department"
               className="block w-full rounded-md border p-2.5 outline-none dark:border-[#002a3f] focus:ring-1 ring-[#002a3f]"
               required
+              defaultValue={"Choice Department"}
+              onChange={(e)=>setDepartment(e.target.value)}
             >
-              <option value="CSE">CSE</option>
-              <option value="EEE">EEE</option>
-              <option value="BBA">BBA</option>
-              <option value="Pharmacy">Pharmacy</option>
-              <option value="English">English</option>
-              <option value="MIS">MIS</option>
+              <option disabled >Choice Department</option>
+              {
+                Department?.map((d,i) => (
+                  <option key={i} value={d?.department}>
+                    {d?.department}
+                  </option>
+                ))
+              }
             </select>
 
 
             {accountType === "Student" && (
               <>
-                <input
-                  type="number"
-                  name="batch"
-                  placeholder="Batch No"
-                  className="block w-full rounded-md border p-2.5 outline-none dark:border-[#002a3f] focus:ring-1 ring-[#002a3f]"
-                />
-                <input
-                  type="number"
-                  name="studentID"
-                  placeholder="Student ID"
-                  className="block w-full rounded-md border p-2.5 outline-none dark:border-[#002a3f] focus:ring-1 ring-[#002a3f]"
-                />
+              <select
+  name="batch"
+  className="block w-full rounded-md border p-2.5 outline-none dark:border-[#002a3f] focus:ring-1 ring-[#002a3f]"
+  required
+  disabled={department === null}
+  defaultValue={"Batch"}
+>
+  <option disabled>Batch</option>
+  {
+    Department?.find(e => e?.department === department)?.batch?.map((data, i) => (
+      <option key={i} value={data}>
+        {data}
+      </option>
+    ))
+  }
+</select>
               </>
             )}
 
@@ -145,7 +146,7 @@ const Voters = () => {
           {/* head */}
           <thead>
             <tr>
-              <th></th>
+              <th>#</th>
               <th>Department</th>
               <th>Program</th>
               <th className="text-center">Batch</th>
@@ -158,7 +159,7 @@ const Voters = () => {
                 <th>{index + 1}</th>
                 <td>{e?.department}</td>
                 <td>{e?.program}</td>
-                <td className="text-center">{e?.batch.map((e) => `${e} `)}</td>
+                <td className="text-center ">{e?.batch.map((e) => `${e} `)}</td>
                 <td className="text-center">
                   <button className="text-white mx-1 bg-[#002a3f] w-auto py-1 px-4 text-2xl rounded hover:bg-[#2ec4b6] hover:text-[#002a3f] duration-300">
                     <MdOutlineSettings />
