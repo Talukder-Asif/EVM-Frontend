@@ -1,6 +1,6 @@
 import { MdDeleteOutline, MdOutlineSettings } from "react-icons/md";
 import useDepartment from "../../../Hooks/useDepartment";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Swal from "sweetalert2";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { storage } from "../../../Config/firebase.config";
@@ -8,26 +8,66 @@ import { v4 } from "uuid";
 import imageCompression from "browser-image-compression";
 import useAxiosSecure from "../../../Hooks/useAxiosSecure";
 import useAllVoters from "../../../Hooks/useAllVoters";
-
+import profilepic from "/src/assets/Man1.png"
 const Voters = () => {
-  const [Department, isDepartmentLoading, refetch] = useDepartment();
-  const [voter, isVoterLoading] = useAllVoters();
+  const [Department, isDepartmentLoading] = useDepartment();
+  const [voter, isVoterLoading, refetch] = useAllVoters();
   const [openModal, setOpenModal] = useState(false);
   const [accountType, setAccountType] = useState("Student");
   const [department, setDepartment] = useState(null);
   const [imageUpload, setImageUpload] = useState(null);
   const axiosSecure = useAxiosSecure();
 
-  console.log(voter);
+
+  const [showDept, setShowDept] = useState("Department");
+  const [filterVoter, setFilterVoter ] = useState(null);
+
+
+  useEffect(() => {
+    // If "Department" is selected, show all voters
+    if (showDept === "Department") {
+      setFilterVoter(voter?.slice());  // Copy the entire voter array
+    } else {
+      // Otherwise, filter voters based on the selected department
+      setFilterVoter(voter?.filter(e => e?.department === showDept));
+    }
+  }, [voter, showDept]);
+
+
+  
 
   const handleAddVoter = async (e) => {
     e.preventDefault();
     const form = e.target;
     if (!imageUpload) {
-      return Swal.fire({
-        title: `Please upload ${form?.name?.value}'s picture`,
-        showConfirmButton: false,
-        timer: 1500,
+      const voterData = {
+        name: form.name?.value,
+        accountType: form.accountType?.value,
+        department: form.department?.value,
+        batch: form.batch?.value,
+        studentID: form.studentID?.value,
+        photoURL: null,
+        OTP: "",
+      };
+      return axiosSecure.post("/voter", voterData).then((res) => {
+        console.log(res.data);
+        if (res?.data?.acknowledged) {
+          form.reset();
+          refetch()
+          Swal.fire({
+            position: "center",
+            icon: "success",
+            title: "Voter's Information Added",
+            showConfirmButton: false,
+            timer: 1500,
+          });
+        } else {
+          Swal.fire({
+            title: "Error during add",
+            text: res?.data,
+            icon: "error",
+          });
+        }
       });
     }
     try {
@@ -58,6 +98,7 @@ const Voters = () => {
         console.log(res.data);
         if (res?.data?.acknowledged) {
           form.reset();
+          refetch()
           Swal.fire({
             position: "center",
             icon: "success",
@@ -209,38 +250,56 @@ const Voters = () => {
             <tr>
               <th></th>
               <th>Name and ID</th>
-              <th>Department</th>
+
+              <th>
+                <select onChange={(e)=>setShowDept(e.target.value)} defaultValue={"Department"} className="select w-full max-w-xs">
+                  <option>
+                    Department
+                  </option>
+                  {
+                    Department?.map((d, i) => (
+                      <option key={i} value={d?.department}>
+                        {d?.department}
+                      </option>
+                    ))
+                  }
+                </select>
+              </th>
+
               <th>Batch</th>
               <th>Buttons</th>
             </tr>
           </thead>
           <tbody>
-            {voter?.map((data, i) => (
+            {filterVoter?.map((data, i) => (
               <tr key={i}>
-                <th>{i+1}</th>
+                <th>{i + 1}</th>
                 <td>
                   <div className="flex items-center gap-3">
                     <div className="avatar">
                       <div className="mask mask-squircle h-12 w-12">
-                        <img
-                          src={data?.photoURL}
-                          alt={data?.name}
-                        />
+                        <img src={data?.photoURL? data.photoURL : profilepic} alt={data?.name} />
                       </div>
                     </div>
                     <div>
                       <div className="font-bold">{data?.name}</div>
-                      <div className="text-sm opacity-90">{data?.studentID}</div>
+                      <div className="text-sm opacity-90">
+                        {data?.studentID}
+                      </div>
                     </div>
                   </div>
                 </td>
                 <td>Department of {data?.department}</td>
                 <td>{data?.batch}</td>
                 <td className="text-center">
-      <button className="text-white mx-1 bg-[#002a3f] w-auto py-1 px-4 text-2xl rounded hover:bg-[#2ec4b6] hover:text-[#002a3f] duration-300"><MdOutlineSettings /></button>
+                  <button className="text-white mx-1 bg-[#002a3f] w-auto py-1 px-4 text-2xl rounded hover:bg-[#2ec4b6] hover:text-[#002a3f] duration-300">
+                    <MdOutlineSettings />
+                  </button>
 
-      <button className="text-white mx-1 bg-red-600 w-auto py-1 px-4 text-2xl rounded hover:bg-red-700 duration-300"><MdDeleteOutline /></button>
-      </td>
+                  <button className="text-white mx-1 bg-red-600 w-auto py-1 px-4 text-2xl rounded hover:bg-red-700 duration-300">
+                    <MdDeleteOutline />
+                  </button>
+                </td>
               </tr>
             ))}
           </tbody>
