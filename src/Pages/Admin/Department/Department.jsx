@@ -9,7 +9,7 @@ const Department = () => {
   const [Department, isDepartmentLoading, refetch] = useDepartment();
   const axiosPublic = useAxios();
 
-  const handleDelete = (e) =>{
+  const handleDelete = (e) => {
     Swal.fire({
       title: "Are you sure?",
       text: `Do you want to delete ${e?.department}?`,
@@ -23,17 +23,20 @@ const Department = () => {
         axiosPublic.delete(`/department/${e?._id}`).then((res) => {
           if (res.data.deletedCount > 0) {
             refetch();
-            Swal.fire({
-              icon: "success",
-              title: `${e?.department} has been deleted from the database`,
-              showConfirmButton: false,
-              timer: 1500,
+            axiosPublic.delete(`/voters/${e?.department}`).then((res) => {
+              console.log(res);
+              Swal.fire({
+                icon: "success",
+                title: `${e?.department} has been deleted from the database`,
+                showConfirmButton: false,
+                timer: 1500,
+              });
             });
           }
         });
       }
     });
-  }
+  };
 
   const handleDepartment = (e) => {
     e.preventDefault();
@@ -41,38 +44,40 @@ const Department = () => {
     const formData = {
       department: form.department.value,
       program: form.program.value,
-      batch: form.batch.value.split(",").map(item => item.trim())    };
+      batch: form.batch.value.split(",").map((item) => item.trim()),
+    };
     console.log(formData);
-    axiosPublic.post("/department", formData)
-  .then((res) => {
-    if (res.data.acknowledged) {
-      refetch();
-      setOpenModal(false);
-      form.reset();
-      Swal.fire({
-        position: "center",
-        icon: "success",
-        title: "Department created successfully!",
-        showConfirmButton: false,
-        timer: 1500,
+    axiosPublic
+      .post("/department", formData)
+      .then((res) => {
+        if (res.data.acknowledged) {
+          refetch();
+          setOpenModal(false);
+          form.reset();
+          Swal.fire({
+            position: "center",
+            icon: "success",
+            title: "Department created successfully!",
+            showConfirmButton: false,
+            timer: 1500,
+          });
+        }
+      })
+      .catch((error) => {
+        if (error.response && error.response.status === 409) {
+          Swal.fire({
+            icon: "error",
+            title: "Oops...",
+            text: `${form?.department?.value} Department already exists!`,
+          });
+        } else {
+          console.error(error);
+        }
       });
-    }
-  })
-  .catch((error) => {
-    if (error.response && error.response.status === 409) {
-      Swal.fire({
-        icon: "error",
-        title: "Oops...",
-        text: `${form?.department?.value} Department already exists!`,
-      });
-    } else {
-      console.error(error);
-    }
-  });
   };
 
-  if(isDepartmentLoading){
-    return <div>Loading...</div>
+  if (isDepartmentLoading) {
+    return <div>Loading...</div>;
   }
 
   return (
@@ -89,23 +94,27 @@ const Department = () => {
               <th className="text-center">Button</th>
             </tr>
           </thead>
-          <tbody>            
-            
-          {
-  Department?.map((e, index) => (
-    <tr className="hover" key={index}>
-      <th>{index + 1}</th>
-      <td>{e?.department}</td>
-      <td>{e?.program}</td>
-      <td className="text-center">{e?.batch.map(e=> `${e} `)}</td>
-      <td className="text-center">
-      <button className="text-white mx-1 bg-[#002a3f] w-auto py-1 px-4 text-2xl rounded hover:bg-[#2ec4b6] hover:text-[#002a3f] duration-300"><MdOutlineSettings /></button>
+          <tbody>
+            {Department?.map((e, index) => (
+              <tr className="hover" key={index}>
+                <th>{index + 1}</th>
+                <td>{e?.department}</td>
+                <td>{e?.program}</td>
+                <td className="text-center">{e?.batch.map((e) => `${e} `)}</td>
+                <td className="text-center">
+                  <button className="text-white mx-1 bg-[#002a3f] w-auto py-1 px-4 text-2xl rounded hover:bg-[#2ec4b6] hover:text-[#002a3f] duration-300">
+                    <MdOutlineSettings />
+                  </button>
 
-      <button onClick={()=>handleDelete(e)} className="text-white mx-1 bg-red-600 w-auto py-1 px-4 text-2xl rounded hover:bg-red-700 duration-300"><MdDeleteOutline /></button>
-      </td>
-    </tr>
-  ))
-}
+                  <button
+                    onClick={() => handleDelete(e)}
+                    className="text-white mx-1 bg-red-600 w-auto py-1 px-4 text-2xl rounded hover:bg-red-700 duration-300"
+                  >
+                    <MdDeleteOutline />
+                  </button>
+                </td>
+              </tr>
+            ))}
           </tbody>
         </table>
 
