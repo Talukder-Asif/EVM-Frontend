@@ -20,21 +20,30 @@ const Voters = () => {
 
 
   const [showDept, setShowDept] = useState("Department");
+  const [selectDept, setSelectDept] = useState(null);  
+  const [showBatch, setShowBatch] = useState("Batch");  
   const [filterVoter, setFilterVoter ] = useState(null);
 
 
   useEffect(() => {
-    // If "Department" is selected, show all voters
-    if (showDept === "Department") {
-      setFilterVoter(voter?.slice());  // Copy the entire voter array
-    } else {
-      // Otherwise, filter voters based on the selected department
-      setFilterVoter(voter?.filter(e => e?.department === showDept));
+    let filteredVoters = voter?.slice();  // Start with all voters
+    
+    // Filter by department
+    if (showDept !== "Department") {
+      filteredVoters = filteredVoters?.filter(e => e?.department === showDept);
+      setSelectDept(Department?.find(f => f.department === showDept));
     }
-  }, [voter, showDept]);
-
-
   
+    // Further filter by batch if applicable
+    if (showBatch !== "Batch") {
+      filteredVoters = filteredVoters?.filter(e => e?.batch === showBatch);
+    }
+  
+    setFilterVoter(filteredVoters);
+  }, [voter, showDept, showBatch, Department]);
+
+console.log(filterVoter)
+
 
   const handleAddVoter = async (e) => {
     e.preventDefault();
@@ -266,7 +275,22 @@ const Voters = () => {
                 </select>
               </th>
 
-              <th>Batch</th>
+
+              <th>
+                <select onChange={(e)=>setShowBatch(e.target.value)} defaultValue={"Batch"} className="select w-full max-w-xs" disabled={!selectDept}>
+                  <option>
+                  Batch
+                  </option>
+                  {
+                    selectDept?.batch?.map((dept, i) => (
+                      <option key={i} value={dept}>
+                        {dept}
+                      </option>
+                    ))
+                  }
+                </select>
+              </th>
+
               <th>Buttons</th>
             </tr>
           </thead>
