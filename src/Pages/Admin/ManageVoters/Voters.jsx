@@ -328,6 +328,14 @@ console.log(filterVoter)
             ))}
           </tbody>
         </table>
+        {
+          filterVoter?.length === 0 && <div className="flex flex-col items-center justify-center min-h-32">
+            <h1 className="text-center text-3xl font-bold">No Voters Found</h1>
+            <p className="text-center text-gray-600">
+              No voters found in the selected department and batch.
+            </p>
+          </div>
+        }
       </div>
     </div>
   );
