@@ -39,6 +39,17 @@ const Voters = () => {
       filteredVoters = filteredVoters?.filter(e => e?.batch === showBatch);
     }
   
+    // Further filter by department is not if applicable
+    if (showDept === "Department") {
+      filteredVoters = voter?.slice();
+      setSelectDept(null);
+
+    }
+
+    if (showBatch === "Batch" && showDept !== "Department") {
+      filteredVoters = voter?.filter(e => e?.department === showDept);
+    }
+  
     setFilterVoter(filteredVoters);
   }, [voter, showDept, showBatch, Department]);
 
