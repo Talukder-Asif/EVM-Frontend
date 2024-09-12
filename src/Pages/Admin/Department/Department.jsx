@@ -3,6 +3,7 @@ import useAxios from "../../../Hooks/useAxios";
 import Swal from "sweetalert2";
 import useDepartment from "../../../Hooks/useDepartment";
 import { MdDeleteOutline, MdOutlineSettings } from "react-icons/md";
+import { Link } from "react-router-dom";
 
 const Department = () => {
   const [openModal, setOpenModal] = useState(false);
@@ -102,9 +103,12 @@ const Department = () => {
                 <td>{e?.program}</td>
                 <td className="text-center">{e?.batch.map((e) => `${e} `)}</td>
                 <td className="text-center">
+                  
+                  <Link to={`/dashboard/department/${e?._id}`}>
                   <button className="text-white mx-1 bg-[#002a3f] w-auto py-1 px-4 text-2xl rounded hover:bg-[#2ec4b6] hover:text-[#002a3f] duration-300">
                     <MdOutlineSettings />
                   </button>
+                  </Link>
 
                   <button
                     onClick={() => handleDelete(e)}
