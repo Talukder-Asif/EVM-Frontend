@@ -142,7 +142,9 @@ const Voters = () => {
       });
     }
   };
-
+  if (isDepartmentLoading || isVoterLoading) {
+    return <div>Loading...</div>;
+  }
   return (
     <div>
       <div className="flex justify-between items-center flex-wrap my-5">
@@ -310,7 +312,7 @@ const Voters = () => {
               <tr key={i}>
                 <th>{i + 1}</th>
                 <td>
-                  <div className="flex items-center justify-center">
+                  <div className="flex items-center gap-3 justify-start">
                     <img
                       onClick={() => {
                         setOpenImg(true);
@@ -322,6 +324,10 @@ const Voters = () => {
                       alt={data?.name}
                       className=" mask mask-squircle h-12 w-12 bg-black/30 text-white rounded-lg cursor-pointer"
                     />
+
+                    <p>{data?.name} <br />
+                    {data?.studentID}
+                    </p>
 
                     <div
                       onClick={() => setOpenImg(false)}
