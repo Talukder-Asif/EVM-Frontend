@@ -8,7 +8,7 @@ import { v4 } from "uuid";
 import imageCompression from "browser-image-compression";
 import useAxiosSecure from "../../../Hooks/useAxiosSecure";
 import useAllVoters from "../../../Hooks/useAllVoters";
-import profilepic from "/src/assets/Man1.png"
+import profilepic from "/src/assets/Man1.png";
 const Voters = () => {
   const [Department, isDepartmentLoading] = useDepartment();
   const [voter, isVoterLoading, refetch] = useAllVoters();
@@ -17,44 +17,44 @@ const Voters = () => {
   const [department, setDepartment] = useState(null);
   const [imageUpload, setImageUpload] = useState(null);
   const axiosSecure = useAxiosSecure();
-
+  const [openImg, setOpenImg] = useState(false);
+  const [openImgUrl, setOpenImgUrl] = useState(false);
 
   const [showDept, setShowDept] = useState("Department");
-  const [selectDept, setSelectDept] = useState(null);  
-  const [showBatch, setShowBatch] = useState("Batch");  
-  const [filterVoter, setFilterVoter ] = useState(null);
-
+  const [selectDept, setSelectDept] = useState(null);
+  const [showBatch, setShowBatch] = useState("Batch");
+  const [filterVoter, setFilterVoter] = useState(null);
 
   useEffect(() => {
-    let filteredVoters = voter?.slice();  // Start with all voters
-    
+    let filteredVoters = voter?.slice(); // Start with all voters
+
     // Filter by department
     if (showDept !== "Department") {
-      filteredVoters = filteredVoters?.filter(e => e?.department === showDept);
-      setSelectDept(Department?.find(f => f.department === showDept));
+      filteredVoters = filteredVoters?.filter(
+        (e) => e?.department === showDept
+      );
+      setSelectDept(Department?.find((f) => f.department === showDept));
     }
-  
+
     // Further filter by batch if applicable
     if (showBatch !== "Batch") {
-      filteredVoters = filteredVoters?.filter(e => e?.batch === showBatch);
+      filteredVoters = filteredVoters?.filter((e) => e?.batch === showBatch);
     }
-  
+
     // Further filter by department is not if applicable
     if (showDept === "Department") {
       filteredVoters = voter?.slice();
       setSelectDept(null);
-
     }
 
     if (showBatch === "Batch" && showDept !== "Department") {
-      filteredVoters = voter?.filter(e => e?.department === showDept);
+      filteredVoters = voter?.filter((e) => e?.department === showDept);
     }
-  
+
     setFilterVoter(filteredVoters);
   }, [voter, showDept, showBatch, Department]);
 
-console.log(filterVoter)
-
+  console.log(filterVoter);
 
   const handleAddVoter = async (e) => {
     e.preventDefault();
@@ -73,7 +73,7 @@ console.log(filterVoter)
         console.log(res.data);
         if (res?.data?.acknowledged) {
           form.reset();
-          refetch()
+          refetch();
           Swal.fire({
             position: "center",
             icon: "success",
@@ -118,7 +118,7 @@ console.log(filterVoter)
         console.log(res.data);
         if (res?.data?.acknowledged) {
           form.reset();
-          refetch()
+          refetch();
           Swal.fire({
             position: "center",
             icon: "success",
@@ -272,33 +272,33 @@ console.log(filterVoter)
               <th>Name and ID</th>
 
               <th>
-                <select onChange={(e)=>setShowDept(e.target.value)} defaultValue={"Department"} className="select w-full max-w-xs">
-                  <option>
-                    Department
-                  </option>
-                  {
-                    Department?.map((d, i) => (
-                      <option key={i} value={d?.department}>
-                        {d?.department}
-                      </option>
-                    ))
-                  }
+                <select
+                  onChange={(e) => setShowDept(e.target.value)}
+                  defaultValue={"Department"}
+                  className="select w-full max-w-xs"
+                >
+                  <option>Department</option>
+                  {Department?.map((d, i) => (
+                    <option key={i} value={d?.department}>
+                      {d?.department}
+                    </option>
+                  ))}
                 </select>
               </th>
 
-
               <th>
-                <select onChange={(e)=>setShowBatch(e.target.value)} defaultValue={"Batch"} className="select w-full max-w-xs" disabled={!selectDept}>
-                  <option>
-                  Batch
-                  </option>
-                  {
-                    selectDept?.batch?.map((dept, i) => (
-                      <option key={i} value={dept}>
-                        {dept}
-                      </option>
-                    ))
-                  }
+                <select
+                  onChange={(e) => setShowBatch(e.target.value)}
+                  defaultValue={"Batch"}
+                  className="select w-full max-w-xs"
+                  disabled={!selectDept}
+                >
+                  <option>Batch</option>
+                  {selectDept?.batch?.map((dept, i) => (
+                    <option key={i} value={dept}>
+                      {dept}
+                    </option>
+                  ))}
                 </select>
               </th>
 
@@ -310,16 +310,62 @@ console.log(filterVoter)
               <tr key={i}>
                 <th>{i + 1}</th>
                 <td>
-                  <div className="flex items-center gap-3">
-                    <div className="avatar">
-                      <div className="mask mask-squircle h-12 w-12">
-                        <img src={data?.photoURL? data.photoURL : profilepic} alt={data?.name} />
-                      </div>
-                    </div>
-                    <div>
-                      <div className="font-bold">{data?.name}</div>
-                      <div className="text-sm opacity-90">
-                        {data?.studentID}
+                  <div className="flex items-center justify-center">
+                    <img
+                      onClick={() => {
+                        setOpenImg(true);
+                        setOpenImgUrl(
+                          data?.photoURL ? data.photoURL : profilepic
+                        );
+                      }}
+                      src={data?.photoURL ? data.photoURL : profilepic}
+                      alt={data?.name}
+                      className=" mask mask-squircle h-12 w-12 bg-black/30 text-white rounded-lg cursor-pointer"
+                    />
+
+                    <div
+                      onClick={() => setOpenImg(false)}
+                      className={`fixed flex justify-center items-center z-[100] ${
+                        openImg ? "visible opacity-1" : "invisible opacity-0"
+                      } inset-0 w-full h-full bg-[#ffffff0d] backdrop-blur-sm duration-100`}
+                    >
+                      <div
+                        onClick={(e_) => e_.stopPropagation()}
+                        className={`absolute drop-shadow-2xl rounded-lg ${
+                          openImg
+                            ? "opacity-1 duration-300 translate-y-0"
+                            : "-translate-y-20 opacity-0 duration-150"
+                        } group overflow-hidden`}
+                      >
+
+                        {/* close button */}
+                        <svg
+                          onClick={() => setOpenImg(false)}
+                          className="w-10 mx-auto hover:opacity-60 absolute right-0 drop-shadow-[0_0_10px_black] cursor-pointer"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <g strokeWidth="0"></g>
+                          <g
+                            id="SVGRepo_tracerCarrier"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          ></g>
+                          <g id="SVGRepo_iconCarrier">
+                            <path
+                              d="M6.99486 7.00636C6.60433 7.39689 6.60433 8.03005 6.99486 8.42058L10.58 12.0057L6.99486 15.5909C6.60433 15.9814 6.60433 16.6146 6.99486 17.0051C7.38538 17.3956 8.01855 17.3956 8.40907 17.0051L11.9942 13.4199L15.5794 17.0051C15.9699 17.3956 16.6031 17.3956 16.9936 17.0051C17.3841 16.6146 17.3841 15.9814 16.9936 15.5909L13.4084 12.0057L16.9936 8.42059C17.3841 8.03007 17.3841 7.3969 16.9936 7.00638C16.603 6.61585 15.9699 6.61585 15.5794 7.00638L11.9942 10.5915L8.40907 7.00636C8.01855 6.61584 7.38538 6.61584 6.99486 7.00636Z"
+                              fill="#fff"
+                            ></path>
+                          </g>
+                        </svg>
+                        {/* image */}
+                        <img
+                          src={openImgUrl}
+                          alt={data?.name}
+                          className="min-w-[300px] md:min-w-[500px] min-h-[200px] md:min-h-[350px] bg-black/50"
+                        />
+
                       </div>
                     </div>
                   </div>
@@ -339,14 +385,14 @@ console.log(filterVoter)
             ))}
           </tbody>
         </table>
-        {
-          filterVoter?.length === 0 && <div className="flex flex-col items-center justify-center min-h-32">
+        {filterVoter?.length === 0 && (
+          <div className="flex flex-col items-center justify-center min-h-32">
             <h1 className="text-center text-3xl font-bold">No Voters Found</h1>
             <p className="text-center text-gray-600">
               No voters found in the selected department and batch.
             </p>
           </div>
-        }
+        )}
       </div>
     </div>
   );
