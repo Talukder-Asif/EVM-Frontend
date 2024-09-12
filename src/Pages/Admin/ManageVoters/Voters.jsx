@@ -18,7 +18,7 @@ const Voters = () => {
   const [imageUpload, setImageUpload] = useState(null);
   const axiosSecure = useAxiosSecure();
   const [openImg, setOpenImg] = useState(false);
-  const [openImgUrl, setOpenImgUrl] = useState(false);
+  const [openImgUrl, setOpenImgUrl] = useState(null);
 
   const [showDept, setShowDept] = useState("Department");
   const [selectDept, setSelectDept] = useState(null);
@@ -53,8 +53,6 @@ const Voters = () => {
 
     setFilterVoter(filteredVoters);
   }, [voter, showDept, showBatch, Department]);
-
-  console.log(filterVoter);
 
   const handleAddVoter = async (e) => {
     e.preventDefault();
@@ -234,15 +232,17 @@ const Voters = () => {
                           </option>
                         ))}
                       </select>
-                      <input
-                        type="number"
-                        placeholder="Student ID"
-                        name="studentID"
-                        className="block w-full rounded-md border p-2.5 outline-none dark:border-[#002a3f] focus:ring-1 ring-[#002a3f]"
-                        required
-                      />
                     </>
                   )}
+                  <input
+                    type="number"
+                    placeholder={
+                      accountType === "Student" ? "Student ID" : "Teachers ID"
+                    }
+                    name="studentID"
+                    className="block w-full rounded-md border p-2.5 outline-none dark:border-[#002a3f] focus:ring-1 ring-[#002a3f]"
+                    required
+                  />
 
                   <input
                     type="file"
@@ -265,6 +265,56 @@ const Voters = () => {
           </div>
         </div>
       </div>
+
+
+
+      <ul className="items-center w-full text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-lg sm:flex dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+        <li className="w-full border-b border-gray-200 sm:border-b-0 sm:border-r dark:border-gray-600">
+          <div className="flex items-center ps-3">
+            <input
+              id="horizontal-list-radio-license"
+              type="radio"
+              value=""
+              name="list-radio"
+              className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-700 dark:focus:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500"
+            />
+            <label className="w-full py-3 ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">
+              All User{" "}
+            </label>
+          </div>
+        </li>
+        <li className="w-full border-b border-gray-200 sm:border-b-0 sm:border-r dark:border-gray-600">
+          <div className="flex items-center ps-3">
+            <input
+              id="horizontal-list-radio-id"
+              type="radio"
+              value=""
+              name="list-radio"
+              className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-700 dark:focus:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500"
+            />
+            <label className="w-full py-3 ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">
+              State ID
+            </label>
+          </div>
+        </li>
+        <li className="w-full border-b border-gray-200 sm:border-b-0 sm:border-r dark:border-gray-600">
+          <div className="flex items-center ps-3">
+            <input
+              id="horizontal-list-radio-military"
+              type="radio"
+              value=""
+              name="list-radio"
+              className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-700 dark:focus:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500"
+            />
+            <label className="w-full py-3 ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">
+              US Military
+            </label>
+          </div>
+        </li>
+      </ul>
+
+
+
       <div className="overflow-x-auto">
         <table className="table">
           {/* head */}
@@ -313,20 +363,23 @@ const Voters = () => {
                 <th>{i + 1}</th>
                 <td>
                   <div className="flex items-center gap-3 justify-start">
-                    <img
-                      onClick={() => {
-                        setOpenImg(true);
-                        setOpenImgUrl(
-                          data?.photoURL ? data.photoURL : profilepic
-                        );
-                      }}
-                      src={data?.photoURL ? data.photoURL : profilepic}
-                      alt={data?.name}
-                      className=" mask mask-squircle h-12 w-12 bg-black/30 text-white rounded-lg cursor-pointer"
-                    />
+                    <div className="h-14 w-14 flex justify-center items-center rounded-lg bg-gray-200 overflow-hidden">
+                      <img
+                        onClick={() => {
+                          setOpenImg(true);
+                          setOpenImgUrl(
+                            data?.photoURL ? data.photoURL : profilepic
+                          );
+                        }}
+                        src={data?.photoURL ? data.photoURL : profilepic}
+                        alt={data?.name}
+                        className="w-full object-contain"
+                      />
+                    </div>
 
-                    <p>{data?.name} <br />
-                    {data?.studentID}
+                    <p>
+                      {data?.name} <br />
+                      {data?.studentID}
                     </p>
 
                     <div
@@ -343,7 +396,6 @@ const Voters = () => {
                             : "-translate-y-20 opacity-0 duration-150"
                         } group overflow-hidden`}
                       >
-
                         {/* close button */}
                         <svg
                           onClick={() => setOpenImg(false)}
@@ -371,13 +423,12 @@ const Voters = () => {
                           alt={data?.name}
                           className="min-w-[300px] md:min-w-[500px] min-h-[200px] md:min-h-[350px] bg-black/50"
                         />
-
                       </div>
                     </div>
                   </div>
                 </td>
                 <td>Department of {data?.department}</td>
-                <td>{data?.batch}</td>
+                <td>{data?.batch ? data.batch : "Teacher"}</td>
                 <td className="text-center">
                   <button className="text-white mx-1 bg-[#002a3f] w-auto py-1 px-4 text-2xl rounded hover:bg-[#2ec4b6] hover:text-[#002a3f] duration-300">
                     <MdOutlineSettings />
