@@ -13,7 +13,7 @@ const HomePage = () => {
         }}
       >
         <div className="hero-overlay bg-opacity-90"></div>
-        <div className="flex flex-col-reverse md:flex-row md:justify-around gap-5 p-5 items-center min-h-[100vh] py-10">
+        <div className="flex flex-col-reverse md:flex-row md:justify-around gap-5 p-5 items-center max-w-screen-xl m-auto min-h-[100vh] py-10">
           <div className="md:w-1/2">
             <h1 className="text-3xl md:text-5xl  text-white font-bold">
               Welcome to the
