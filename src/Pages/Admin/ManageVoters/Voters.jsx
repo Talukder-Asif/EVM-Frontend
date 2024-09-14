@@ -25,8 +25,10 @@ const Voters = () => {
   const [showBatch, setShowBatch] = useState("Batch");
   const [filterVoter, setFilterVoter] = useState(null);
 
+
+  
   useEffect(() => {
-    let filteredVoters = voter?.slice(); // Start with all voters
+    let filteredVoters = voter?.slice(); 
 
     // Filter by department
     if (showDept !== "Department") {
@@ -53,6 +55,9 @@ const Voters = () => {
 
     setFilterVoter(filteredVoters);
   }, [voter, showDept, showBatch, Department]);
+
+
+
 
   const handleAddVoter = async (e) => {
     e.preventDefault();
@@ -268,51 +273,6 @@ const Voters = () => {
 
 
 
-      <ul className="items-center w-full text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-lg sm:flex dark:bg-gray-700 dark:border-gray-600 dark:text-white">
-        <li className="w-full border-b border-gray-200 sm:border-b-0 sm:border-r dark:border-gray-600">
-          <div className="flex items-center ps-3">
-            <input
-              id="horizontal-list-radio-license"
-              type="radio"
-              value=""
-              name="list-radio"
-              className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-700 dark:focus:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500"
-            />
-            <label className="w-full py-3 ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">
-              All User{" "}
-            </label>
-          </div>
-        </li>
-        <li className="w-full border-b border-gray-200 sm:border-b-0 sm:border-r dark:border-gray-600">
-          <div className="flex items-center ps-3">
-            <input
-              id="horizontal-list-radio-id"
-              type="radio"
-              value=""
-              name="list-radio"
-              className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-700 dark:focus:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500"
-            />
-            <label className="w-full py-3 ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">
-              State ID
-            </label>
-          </div>
-        </li>
-        <li className="w-full border-b border-gray-200 sm:border-b-0 sm:border-r dark:border-gray-600">
-          <div className="flex items-center ps-3">
-            <input
-              id="horizontal-list-radio-military"
-              type="radio"
-              value=""
-              name="list-radio"
-              className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-700 dark:focus:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500"
-            />
-            <label className="w-full py-3 ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">
-              US Military
-            </label>
-          </div>
-        </li>
-      </ul>
-
 
 
       <div className="overflow-x-auto">
@@ -325,7 +285,8 @@ const Voters = () => {
 
               <th>
                 <select
-                  onChange={(e) => setShowDept(e.target.value)}
+                  onChange={(e) => {setShowDept(e.target.value); setShowBatch("Batch");
+                    setSelectDept(null)}}
                   defaultValue={"Department"}
                   className="select w-full max-w-xs"
                 >
@@ -347,7 +308,7 @@ const Voters = () => {
                 >
                   <option>Batch</option>
                   {selectDept?.batch?.map((dept, i) => (
-                    <option key={i} value={dept}>
+                    <option key={i}>
                       {dept}
                     </option>
                   ))}
