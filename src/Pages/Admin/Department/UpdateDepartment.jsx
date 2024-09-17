@@ -44,34 +44,25 @@ const UpdateDepartment = () => {
 
       <div className="space-y-4">
         {departmentData?.batch.map((data, i) => (
-          <div key={i} className="collapse collapse-arrow bg-base-200">
-            <input type="radio" name="my-accordion-2" defaultChecked />
+          <div key={i} className="bg-base-200">
             <div className="collapse-title text-xl font-medium flex justify-between">
               <p>{data} Batch</p>
+            <p>Total Voters: {departmentVoter?.filter(e => e.batch === data).length}</p>
+
               <button className="text-white mx-1 bg-red-600 w-auto py-1 px-4 text-2xl rounded hover:bg-red-700 duration-300">
                     <MdDeleteOutline />
                   </button>
             </div>
-            <div className="collapse-content">
-              {
-                departmentVoter?.filter(e => e.batch === data)?.map((d, i)=>(
-                  <div key={i}>
-                      e
-                  </div>
-                ))
-              }
-            </div>
           </div>
         ))}
-        <div className="collapse collapse-arrow bg-base-200">
-            <input type="radio" name="my-accordion-2" defaultChecked />
-            <div className="collapse-title text-xl font-medium">
-              Teachers
+        <div className="collapse-title text-xl font-medium flex justify-between">
+              <p>Teachers</p>
+            <p>Total Voters: {departmentVoter?.filter(e => e.accountType === "Teacher").length}</p>
+
+              <button className="text-white mx-1 bg-red-600 w-auto py-1 px-4 text-2xl rounded hover:bg-red-700 duration-300">
+                    <MdDeleteOutline />
+                  </button>
             </div>
-            <div className="collapse-content">
-              <p>hello</p>
-            </div>
-          </div>
       </div>
 
 
