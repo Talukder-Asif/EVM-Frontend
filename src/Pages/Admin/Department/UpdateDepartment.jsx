@@ -11,19 +11,33 @@ const UpdateDepartment = () => {
   const [departmentVoter, setDepartmentVoter] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const axiosPrivate = useAxiosSecure();
-  const axiosPublic = useAxios()
+  const axiosPublic = useAxios();
   const [openModal, setOpenModal] = useState(false);
-
+  const [error, setError] = useState("");
 
   const handleBatch = (e) => {
     e.preventDefault();
     const form = e.target;
-    const newBatch= form.batch.value.split(",").map((item) => item.trim())
+    const newBatch = form.batch.value.split(",").map((item) => item.trim());
+
+    const existingBatch = departmentData?.batch || [];
+    const duplicateBatches = newBatch.filter((batch) =>
+      existingBatch.includes(batch)
+    );
+
+    if (duplicateBatches.length > 0) {
+      setError(`Batch ${duplicateBatches.join(", ")} already exist!`);
+      return;
+    } else {
+      setError("");
+    }
+
     const formData = {
       department: departmentData?.department,
       program: departmentData?.program,
-      batch: [...(departmentData?.batch || []), ...newBatch]
-    }
+      batch: [...existingBatch, ...newBatch],
+    };
+
     console.log(formData);
     axiosPublic
       .put(`/department/${params}`, formData)
@@ -34,7 +48,7 @@ const UpdateDepartment = () => {
           Swal.fire({
             position: "center",
             icon: "success",
-            title: "Department created successfully!",
+            title: "Department updated successfully!",
             showConfirmButton: false,
             timer: 1500,
           });
@@ -52,12 +66,6 @@ const UpdateDepartment = () => {
         }
       });
   };
-
-
-
-
-
-
 
   useEffect(() => {
     axiosPrivate.get(`/department/${params}`).then((res) => {
@@ -86,76 +94,77 @@ const UpdateDepartment = () => {
         <h4>Total Voters : {departmentVoter?.length}</h4>
       </div>
 
-
-
       <div className="space-y-4">
         {departmentData?.batch.map((data, i) => (
           <div key={i} className="bg-base-200">
             <div className="collapse-title text-xl font-medium flex justify-between">
               <p>{data} Batch</p>
-            <p>Total Voters: {departmentVoter?.filter(e => e.batch === data).length}</p>
+              <p>
+                Total Voters:{" "}
+                {departmentVoter?.filter((e) => e.batch === data).length}
+              </p>
 
               <button className="text-white mx-1 bg-red-600 w-auto py-1 px-4 text-2xl rounded hover:bg-red-700 duration-300">
-                    <MdDeleteOutline />
-                  </button>
+                <MdDeleteOutline />
+              </button>
             </div>
           </div>
         ))}
         <div className="collapse-title text-xl font-medium flex justify-between">
-              <p>Teachers</p>
-            <p>Total Voters: {departmentVoter?.filter(e => e.accountType === "Teacher").length}</p>
+          <p>Teachers</p>
+          <p>
+            Total Voters:{" "}
+            {departmentVoter?.filter((e) => e.accountType === "Teacher").length}
+          </p>
 
-              <button className="text-white mx-1 bg-red-600 w-auto py-1 px-4 text-2xl rounded hover:bg-red-700 duration-300">
-                    <MdDeleteOutline />
-                  </button>
-            </div>
+          <button className="text-white mx-1 bg-red-600 w-auto py-1 px-4 text-2xl rounded hover:bg-red-700 duration-300">
+            <MdDeleteOutline />
+          </button>
+        </div>
       </div>
 
-
-
       <div className="mx-auto flex items-center mt-4 justify-center">
-          <button
-            onClick={() => setOpenModal(true)}
-            className="rounded-md bg-[#002a3f] hover:bg-[#2ec4b6] duration-300 hover:text-[#002a3f] py-2 px-5 w-1/2 text-white"
-          >
-            Add New Batch
-          </button>
+        <button
+          onClick={() => setOpenModal(true)}
+          className="rounded-md bg-[#002a3f] hover:bg-[#2ec4b6] duration-300 hover:text-[#002a3f] py-2 px-5 w-1/2 text-white"
+        >
+          Add New Batch
+        </button>
+        <div
+          onClick={() => setOpenModal(false)}
+          className={`fixed z-[100] flex items-center justify-center ${
+            openModal ? "opacity-1 visible" : "invisible opacity-0"
+          } inset-0 h-full w-full bg-black/20 backdrop-blur-sm duration-100`}
+        >
           <div
-            onClick={() => setOpenModal(false)}
-            className={`fixed z-[100] flex items-center justify-center ${
-              openModal ? "opacity-1 visible" : "invisible opacity-0"
-            } inset-0 h-full w-full bg-black/20 backdrop-blur-sm duration-100`}
+            onClick={(e_) => e_.stopPropagation()}
+            className={`absolute w-full rounded-lg bg-white dark:bg-gray-900 drop-shadow-2xl sm:w-[500px] ${
+              openModal
+                ? "opacity-1 translate-y-0 duration-300"
+                : "-translate-y-20 opacity-0 duration-150"
+            }`}
           >
-            <div
-              onClick={(e_) => e_.stopPropagation()}
-              className={`absolute w-full rounded-lg bg-white dark:bg-gray-900 drop-shadow-2xl sm:w-[500px] ${
-                openModal
-                  ? "opacity-1 translate-y-0 duration-300"
-                  : "-translate-y-20 opacity-0 duration-150"
-              }`}
-            >
-              <form onSubmit={handleBatch} className="p-8 text-center">
-                <input
-                  type="text"
-                  placeholder="Batch EX: 14th, 15th"
-                  name="batch"
-                  className="block my-2 w-full rounded-md border p-2.5 outline-none dark:border-[#002a3f] focus:ring-1 ring-[#002a3f]"
-                  required
-                />
-                <button
-                  type="submit"
-                  className="btn shadow w-full md:w-1/2 border-[#002a3f] bg-[#002a3f] text-white hover:text-[#002a3f] hover:border-[#2ec4b6] hover:bg-[#2ec4b6] duration-500 mt-2 hover:scale-105 hover:shadow-[#2ec4b6] uppercase text-base font-normal m-auto"
-                >
-                  Add Batch
-                </button>
-              </form>
-            </div>
+            <form onSubmit={handleBatch} className="p-8 text-center">
+              <input
+                type="text"
+                placeholder="Batch EX: 14th, 15th"
+                name="batch"
+                className="block my-2 w-full rounded-md border p-2.5 outline-none dark:border-[#002a3f] focus:ring-1 ring-[#002a3f]"
+                required
+              />
+              {error && (
+                <p className="text-red-500 text-sm mt-2">{error}</p> // Display error if exists
+              )}
+              <button
+                type="submit"
+                className="btn shadow w-full md:w-1/2 border-[#002a3f] bg-[#002a3f] text-white hover:text-[#002a3f] hover:border-[#2ec4b6] hover:bg-[#2ec4b6] duration-500 mt-2 hover:scale-105 hover:shadow-[#2ec4b6] uppercase text-base font-normal m-auto"
+              >
+                Add Batch
+              </button>
+            </form>
           </div>
         </div>
-
-
-
-
+      </div>
     </div>
   );
 };
