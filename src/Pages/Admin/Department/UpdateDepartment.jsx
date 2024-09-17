@@ -14,6 +14,7 @@ const UpdateDepartment = () => {
   const axiosPublic = useAxios();
   const [openModal, setOpenModal] = useState(false);
   const [error, setError] = useState("");
+  const [refatch, setRefatch] = useState(false);
 
   const handleBatch = (e) => {
     e.preventDefault();
@@ -43,6 +44,7 @@ const UpdateDepartment = () => {
       .then((res) => {
         if (res?.data?.modifiedCount > 0) {
           setOpenModal(false);
+          setRefatch(!refatch)
           form.reset();
           Swal.fire({
             position: "center",
@@ -88,7 +90,8 @@ const UpdateDepartment = () => {
             axiosPublic
               .delete(`/voters/${departmentData?.department}/${e}`)
               .then((res) => {
-                console.log(res);
+                console.log(res.data)
+                setRefatch(!refatch)
                 Swal.fire({
                   icon: "success",
                   title: `${e} batch has been deleted from the database`,
@@ -110,7 +113,7 @@ const UpdateDepartment = () => {
         setDepartmentVoter(res.data);
       });
     });
-  }, [axiosPrivate, params, departmentData?.department]);
+  }, [axiosPrivate, params, departmentData?.department, refatch]);
 
   if (isLoading) {
     return <div>Loading...</div>;
