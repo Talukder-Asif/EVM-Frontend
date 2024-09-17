@@ -38,7 +38,6 @@ const UpdateDepartment = () => {
       batch: [...existingBatch, ...newBatch],
     };
 
-    console.log(formData);
     axiosPublic
       .put(`/department/${params}`, formData)
       .then((res) => {
@@ -65,6 +64,42 @@ const UpdateDepartment = () => {
           console.error(error);
         }
       });
+  };
+
+  const handleDelete = (e) => {
+    Swal.fire({
+      title: "Are you sure?",
+      text: `Do you want to delete ${e} batch? All voters of ${e} batch will be delete.`,
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#eb0029",
+      cancelButtonColor: "#28b392",
+      confirmButtonText: "Yes",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        const formData = {
+          department: departmentData?.department,
+          program: departmentData?.program,
+          batch: departmentData?.batch.filter((data) => data !== e),
+        };
+
+        axiosPublic.put(`/department/${params}`, formData).then((res) => {
+          if (res?.data?.modifiedCount > 0) {
+            axiosPublic
+              .delete(`/voters/${departmentData?.department}/${e}`)
+              .then((res) => {
+                console.log(res);
+                Swal.fire({
+                  icon: "success",
+                  title: `${e} batch has been deleted from the database`,
+                  showConfirmButton: false,
+                  timer: 1500,
+                });
+              });
+          }
+        });
+      }
+    });
   };
 
   useEffect(() => {
@@ -104,22 +139,23 @@ const UpdateDepartment = () => {
                 {departmentVoter?.filter((e) => e.batch === data).length}
               </p>
 
-              <button className="text-white mx-1 bg-red-600 w-auto py-1 px-4 text-2xl rounded hover:bg-red-700 duration-300">
+              <button
+                onClick={() => handleDelete(data)}
+                className="text-white mx-1 bg-red-600 w-auto py-1 px-4 text-2xl rounded hover:bg-red-700 duration-300"
+              >
                 <MdDeleteOutline />
               </button>
             </div>
           </div>
         ))}
-        <div className="collapse-title text-xl font-medium flex justify-between">
+        <div className="collapse-title text-xl bg-base-200 font-medium flex justify-between">
           <p>Teachers</p>
           <p>
             Total Voters:{" "}
             {departmentVoter?.filter((e) => e.accountType === "Teacher").length}
           </p>
 
-          <button className="text-white mx-1 bg-red-600 w-auto py-1 px-4 text-2xl rounded hover:bg-red-700 duration-300">
-            <MdDeleteOutline />
-          </button>
+          <div> </div>
         </div>
       </div>
 
