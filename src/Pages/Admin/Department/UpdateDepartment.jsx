@@ -1,6 +1,7 @@
 import { useParams } from "react-router-dom";
 import useAxiosSecure from "../../../Hooks/useAxiosSecure";
 import { useEffect, useState } from "react";
+import { MdDeleteOutline } from "react-icons/md";
 
 const UpdateDepartment = () => {
   const params = useParams().id;
@@ -45,11 +46,20 @@ const UpdateDepartment = () => {
         {departmentData?.batch.map((data, i) => (
           <div key={i} className="collapse collapse-arrow bg-base-200">
             <input type="radio" name="my-accordion-2" defaultChecked />
-            <div className="collapse-title text-xl font-medium">
-              {data} Batch
+            <div className="collapse-title text-xl font-medium flex justify-between">
+              <p>{data} Batch</p>
+              <button className="text-white mx-1 bg-red-600 w-auto py-1 px-4 text-2xl rounded hover:bg-red-700 duration-300">
+                    <MdDeleteOutline />
+                  </button>
             </div>
             <div className="collapse-content">
-              <p>hello</p>
+              {
+                departmentVoter?.filter(e => e.batch === data)?.map((d, i)=>(
+                  <div key={i}>
+                      e
+                  </div>
+                ))
+              }
             </div>
           </div>
         ))}
